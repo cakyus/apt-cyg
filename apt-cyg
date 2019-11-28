@@ -139,6 +139,15 @@ function apt_init(){
 	if [ ! -f /etc/setup/installed.db ]; then
 		touch /etc/setup/installed.db
 	fi
+
+	if [ ! -f /etc/setup/setup.rc ]; then
+		cat <<EOF > /etc/setup/setup.rc
+last-mirror
+	http://ftp.jaist.ac.jp/pub/cygwin/
+net-method
+	Direct
+EOF
+	fi
 }
 
 function find-workspace {
