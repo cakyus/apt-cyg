@@ -676,6 +676,8 @@ done
 
 set -a
 
+apt_init
+
 if type -t apt-$command | grep -q function
 then
   readonly arch=${HOSTTYPE/i6/x}
