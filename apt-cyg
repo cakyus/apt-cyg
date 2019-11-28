@@ -150,7 +150,7 @@ EOF
 	fi
 }
 
-function find-workspace {
+function find_workspace {
   # default working directory and mirror
 
   # work wherever setup worked last, if possible
@@ -181,12 +181,12 @@ function find-workspace {
   then
     return 0
   else
-    get-setup
+    get_setup
     return 1
   fi
 }
 
-function get-setup {
+function get_setup {
   touch setup.ini
   mv setup.ini setup.ini-save
   wget -N $mirror/$arch/setup.bz2
@@ -201,7 +201,7 @@ function get-setup {
   fi
 }
 
-function check-packages {
+function check_packages {
   if [[ $pks ]]
   then
     return 0
@@ -215,16 +215,16 @@ function warn {
   printf '\e[1;31m%s\e[m\n' "$*" >&2
 }
 
-function apt-update {
-  if find-workspace
+function apt_update {
+  if find_workspace
   then
-    get-setup
+    get_setup
   fi
 }
 
-function apt-category {
-  check-packages
-  find-workspace
+function apt_category {
+  check_packages
+  find_workspace
   for pkg in "${pks[@]}"
   do
     awk '
@@ -249,9 +249,9 @@ function apt_list {
   awk 'NR>1 && $0=$1' /etc/setup/installed.db
 }
 
-function apt-listall {
-  check-packages
-  find-workspace
+function apt_listall {
+  check_packages
+  find_workspace
   local sbq
   for pkg in "${pks[@]}"
   do
@@ -260,9 +260,9 @@ function apt-listall {
   done
 }
 
-function apt-listfiles {
-  check-packages
-  find-workspace
+function apt_listfiles {
+  check_packages
+  find_workspace
   local pkg sbq
   for pkg in "${pks[@]}"
   do
@@ -275,9 +275,9 @@ function apt-listfiles {
   done
 }
 
-function apt-show {
-  find-workspace
-  check-packages
+function apt_show {
+  find_workspace
+  check_packages
   for pkg in "${pks[@]}"
   do
     (( notfirst++ )) && echo
@@ -294,9 +294,9 @@ function apt-show {
   done
 }
 
-function apt-depends {
-  find-workspace
-  check-packages
+function apt_depends {
+  find_workspace
+  check_packages
   for pkg in "${pks[@]}"
   do
     awk '
@@ -329,8 +329,8 @@ function apt-depends {
   done
 }
 
-function apt-rdepends {
-  find-workspace
+function apt_rdepends {
+  find_workspace
   for pkg in "${pks[@]}"
   do
     awk '
@@ -363,9 +363,9 @@ function apt-rdepends {
   done
 }
 
-function apt-download {
-  check-packages
-  find-workspace
+function apt_download {
+  check_packages
+  find_workspace
   local pkg sbq
   for pkg in "${pks[@]}"
   do
@@ -419,8 +419,8 @@ function download {
   echo $dn $bn > /tmp/dwn
 }
 
-function apt-search {
-  check-packages
+function apt_search {
+  check_packages
   echo Searching downloaded packages...
   for pkg in "${pks[@]}"
   do
@@ -440,7 +440,7 @@ function apt-search {
   done
 }
 
-function apt-searchall {
+function apt_searchall {
   cd /tmp
   for pkg in "${pks[@]}"
   do
@@ -456,9 +456,9 @@ function apt-searchall {
   done
 }
 
-function apt-install {
-  check-packages
-  find-workspace
+function apt_install {
+  check_packages
+  find_workspace
   local pkg dn bn requires wr package sbq script
   for pkg in "${pks[@]}"
   do
@@ -531,8 +531,8 @@ function apt-install {
   done
 }
 
-function apt-remove {
-  check-packages
+function apt_remove {
+  check_packages
   cd /etc
   cygcheck awk bash bunzip2 grep gzip mv sed tar xz > setup/essential.lst
   for pkg in "${pks[@]}"
@@ -591,7 +591,7 @@ function apt-remove {
   done
 }
 
-function apt-mirror {
+function apt_mirror {
   if [ "$pks" ]
   then
     awk -i inplace '
@@ -612,7 +612,7 @@ function apt-mirror {
   fi
 }
 
-function apt-cache {
+function apt_cache {
   if [ "$pks" ]
   then
     vas=$(cygpath -aw "$pks")
@@ -687,16 +687,10 @@ set -a
 
 apt_init
 
-if type -t apt-$command | grep -q function
+if type -t apt_$command | grep -q function
 then
-  readonly arch=${HOSTTYPE/i6/x}
-  apt-$command
+	readonly arch=${HOSTTYPE/i6/x}
+	apt_$command
 else
-	if type -t apt_$command | grep -q function
-	then
-		readonly arch=${HOSTTYPE/i6/x}
-		apt_$command
-	else
-		printf "$usage"
-	fi
+	printf "$usage"
 fi
