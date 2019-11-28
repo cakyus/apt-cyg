@@ -175,12 +175,23 @@ function find_workspace {
   s : %3a g
   ' <<< "$mirror")
 
-  mkdir -p "$cache/$mirrordir/$arch"
+  if [ ! -z "$cache" ]; then
+		warn "'cache' is not defined"
+		exit 1
+  fi
+
+  if [ ! -z "$arch" ]; then
+		warn "'arch' is not defined"
+		exit 1
+  fi
+
+	echo "$cache/$mirrordir/$arch"
+	mkdir -p "$cache/$mirrordir/$arch"
   cd "$cache/$mirrordir/$arch"
-  if [ -e setup.ini ]
-  then
+  if [ -e setup.ini ]; then
     return 0
   else
+		warn "file 'setup.ini' is not found"
     get_setup
     return 1
   fi
