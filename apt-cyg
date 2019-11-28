@@ -229,7 +229,7 @@ function apt-category {
   done
 }
 
-function apt-list {
+function apt_list {
   local sbq
   for pkg in "${pks[@]}"
   do
@@ -681,5 +681,11 @@ then
   readonly arch=${HOSTTYPE/i6/x}
   apt-$command
 else
-  printf "$usage"
+	if type -t apt_$command | grep -q function
+	then
+		readonly arch=${HOSTTYPE/i6/x}
+		apt_$command
+	else
+		printf "$usage"
+	fi
 fi
