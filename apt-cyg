@@ -750,6 +750,10 @@ function print_warn(){
 	echo $(date +%Y-%m-%d+%H:%M:%S)" WARN  "$@
 }
 
+function print_error(){
+	echo $(date +%Y-%m-%d+%H:%M:%S)" ERROR "$@
+}
+
 function print_debug(){
 	echo $(date +%Y-%m-%d+%H:%M:%S)" DEBUG "$@
 }
