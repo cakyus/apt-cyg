@@ -541,11 +541,13 @@ function apt_install {
 			APT_REPO_NAME=${APT_REPO_LINE:0:32}
 			APT_REPO_URL=${APT_REPO_LINE:33}
 			APT_PACKAGES_FILE=/var/lib/apt/lists/$APT_REPO_NAME/packages
-			APT_PACKAGE_FILE=/var/cache/apt/$APT_REPO_NAME/$PACKAGE
+			APT_PACKAGE_FILE=/var/cache/apt/$APT_REPO_NAME/packages/$PACKAGE
 
 			if [ ! -f $APT_PACKAGES_FILE ]; then
 				continue
 			fi
+
+			mkdir -p /var/cache/apt/$APT_REPO_NAME/packages
 
 			awk '$1 == pc' RS='\n\n@ ' FS='\n' pc=$PACKAGE $APT_PACKAGES_FILE > $APT_PACKAGE_FILE
 			APT_PACKAGE_REQUIRES=$(awk '$1=="requires", $0=$2' FS=': ' $APT_PACKAGE_FILE)
@@ -563,12 +565,23 @@ function apt_install {
 				return 1
 			fi
 			APT_PACKAGE_URL=$APT_REPO_URL/$APT_PACKAGE_URL
-			APT_PACKAGE_FILE=/var/cache/apt/$APT_REPO_NAME/$( basename $APT_PACKAGE_URL )
+			APT_PACKAGE_FILE=/var/cache/apt/$APT_REPO_NAME/archives/$( basename $APT_PACKAGE_URL )
+
+			mkdir -p /var/cache/apt/$APT_REPO_NAME/archives
+
 			print_debug "Downloading '$APT_PACKAGE_URL' .."
 			print_debug "Download to '$APT_PACKAGE_FILE' .."
 			if [ ! -f $APT_PACKAGE_FILE ]; then
 				copy_url $APT_PACKAGE_URL $APT_PACKAGE_FILE
 			fi
+			print_debug "Save file list to /var/lib/apt/files .."
+			tar tf $APT_PACKAGE_FILE | while read -r APT_PACKAGE_FILE_PATH ; do
+					echo "$PACKAGE /$APT_PACKAGE_FILE_PATH" >> /var/lib/apt/files
+				done
+
+			print_debug "Extracting '$PACKAGE' .."
+			tar x -C / -f $APT_PACKAGE_FILE
+			echo $PACKAGE >> /var/lib/apt/installed
 			return 0
 		done
 	done
