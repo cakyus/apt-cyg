@@ -645,21 +645,21 @@ function apt_update {
 	local APT_REPO_NAME=$( echo -n $APT_REPO_URL | md5sum | awk '{print $1}' )
 	local APT_REPO_CACHE_DIR=/var/cache/apt/$APT_REPO_NAME
 
-	>2& echo "Processing $APT_REPO_URL .."
+	print_debug "Processing $APT_REPO_URL .."
 
-	>2& echo "Using cache folder $APT_REPO_CACHE_DIR .."
+	print_debug "Using cache folder $APT_REPO_CACHE_DIR .."
 	rm -rf $APT_REPO_CACHE_DIR
 	mkdir $APT_REPO_CACHE_DIR
 
-	>2& echo "Download $APT_REPO_SETUP_URL .."
+	print_debug "Download $APT_REPO_SETUP_URL .."
 	copy_url $APT_REPO_SETUP_URL $APT_REPO_CACHE_DIR/setup.bz2
 	bunzip2 $APT_REPO_CACHE_DIR/setup.bz2
 
-	>2& echo "Update database /var/lib/apt .."
+	print_debug "Updating /var/lib/apt/lists .."
 	mkdir -p /var/lib/apt/lists/$APT_REPO_NAME
 	mv $APT_REPO_CACHE_DIR/setup /var/lib/apt/lists/$APT_REPO_NAME/Packages
 
-	>2& echo "Done"
+	print_debug "Done"
 }
 
 # Copy URL to file
