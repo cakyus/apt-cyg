@@ -285,7 +285,42 @@ function apt_listfiles {
   done
 }
 
+# HELP  show - Show a readable record for the package
+
 function apt_show {
+
+	local APT_ARCH=${HOSTTYPE/i6/x}
+	local APT_REPO_NAME
+	local APT_REPO_URL
+	local APT_PACKAGES_FILE
+	local APT_PACKAGE_FILE
+	local APT_PACKAGE_REQUIRES
+	local APT_PACKAGE_REQUIRE
+	local PACKAGE
+
+  for PACKAGE in $@
+  do
+
+		cat /var/lib/apt/repositories | while read -r APT_REPO_LINE ; do
+
+			APT_REPO_NAME=${APT_REPO_LINE:0:32}
+			APT_REPO_URL=${APT_REPO_LINE:33}
+			APT_PACKAGES_FILE=/var/lib/apt/lists/$APT_REPO_NAME/packages
+			APT_PACKAGE_FILE=/var/cache/apt/$APT_REPO_NAME/$PACKAGE
+
+			if [ ! -f $APT_PACKAGES_FILE ]; then
+				continue
+			fi
+
+			awk '$1 == pc' RS='\n\n@ ' FS='\n' pc=$PACKAGE $APT_PACKAGES_FILE > $APT_PACKAGE_FILE
+			cat $APT_PACKAGE_FILE
+		done
+	done
+
+	return 0
+}
+
+function apt_show_old {
   find_workspace
   check_packages
   for pkg in "${pks[@]}"
