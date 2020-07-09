@@ -73,3 +73,8 @@ apt-cyg is a simple script. To install:
 Example use of apt-cyg:
 
     apt-cyg install nano
+
+Notes
+-----
+
+ 1. Packages in repository compressed in .xz format but xz-utils is not installed by default
