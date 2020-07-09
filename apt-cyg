@@ -740,6 +740,18 @@ do
   esac
 done
 
+function print_info(){
+	echo $(date +%Y-%m-%d+%H:%M:%S)" INFO  "$@
+}
+
+function print_warn(){
+	echo $(date +%Y-%m-%d+%H:%M:%S)" WARN  "$@
+}
+
+function print_debug(){
+	echo $(date +%Y-%m-%d+%H:%M:%S)" DEBUG "$@
+}
+
 function apt_help(){
 	grep '^# HELP ' apt-cyg | cut -b 8-
 }
