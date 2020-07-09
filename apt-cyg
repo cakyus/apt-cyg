@@ -668,7 +668,7 @@ function copy_url {
 
 	local REMOTE_URL=$1
 	local LOCAL_FILE=$2
-	/mingw32/bin/curl --output $LOCAL_FILE $REMOTE_URL
+	/mingw32/bin/curl --silent --output $LOCAL_FILE $REMOTE_URL
 }
 
 function apt_cache {
