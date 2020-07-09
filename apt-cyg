@@ -143,6 +143,8 @@ function apt_init(){
 	if [ ! -f /etc/apt/sources.list ]; then
 		echo 'deb http://ftp.jaist.ac.jp/pub/cygwin/ default main' > /etc/apt/sources.list
 	fi
+
+	touch /var/lib/apt/installed
 }
 
 function find_workspace {
