@@ -221,7 +221,9 @@ function warn {
   printf '\e[1;31m%s\e[m\n' "$*" >&2
 }
 
-function apt_update {
+# DEPRECATED
+
+function apt_update_old {
   if find_workspace
   then
     get_setup
@@ -619,6 +621,40 @@ function apt_mirror {
 }
 
 # HELP  update - Retrieve new lists of packages
+
+function apt_update {
+
+	local APT_ARCH=${HOSTTYPE/i6/x}
+	local APT_REPO_URL=http://ftp.jaist.ac.jp/pub/cygwin
+	local APT_REPO_SETUP_URL=http://ftp.jaist.ac.jp/pub/cygwin/$APT_ARCH/setup.bz2
+	local APT_REPO_NAME=$( echo -n $APT_REPO_URL | md5sum | awk '{print $1}' )
+	local APT_REPO_CACHE_DIR=/var/cache/apt/$APT_REPO_NAME
+
+	>2& echo "Processing $APT_REPO_URL .."
+
+	>2& echo "Using cache folder $APT_REPO_CACHE_DIR .."
+	rm -rf $APT_REPO_CACHE_DIR
+	mkdir $APT_REPO_CACHE_DIR
+
+	>2& echo "Download $APT_REPO_SETUP_URL .."
+	copy_url $APT_REPO_SETUP_URL $APT_REPO_CACHE_DIR/setup.bz2
+	bunzip2 $APT_REPO_CACHE_DIR/setup.bz2
+
+	>2& echo "Update database /var/lib/apt .."
+	mkdir -p /var/lib/apt/lists/$APT_REPO_NAME
+	mv $APT_REPO_CACHE_DIR/setup /var/lib/apt/lists/$APT_REPO_NAME/Packages
+
+	>2& echo "Done"
+}
+
+# Copy URL to file
+
+function copy_url {
+
+	local REMOTE_URL=$1
+	local LOCAL_FILE=$2
+	/mingw32/bin/curl --output $LOCAL_FILE $REMOTE_URL
+}
 
 function apt_cache {
   if [ "$pks" ]
