@@ -765,7 +765,7 @@ apt_init
 if type -t apt_$command | grep -q function
 then
 	readonly arch=${HOSTTYPE/i6/x}
-	apt_$command
+	apt_$command $pks
 else
 	apt_help
 fi
