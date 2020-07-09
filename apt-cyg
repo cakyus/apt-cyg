@@ -294,9 +294,6 @@ function apt_show {
 	local APT_REPO_URL
 	local APT_PACKAGES_FILE
 	local APT_PACKAGE_FILE
-	local APT_PACKAGE_REQUIRES
-	local APT_PACKAGE_REQUIRE
-	local PACKAGE
 
   for PACKAGE in $@
   do
