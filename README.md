@@ -77,4 +77,4 @@ Example use of apt-cyg:
 Notes
 -----
 
- 1. Packages in repository compressed in .xz format but xz-utils is not installed by default
+ 1. Packages in repository compressed in .xz format but xz is not installed by default. Packages need to be installed manually: xz, libgcc1, libintl8, liblzma5, cygwin, and libiconv2.
