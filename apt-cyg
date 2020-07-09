@@ -479,7 +479,72 @@ function apt_searchall {
   done
 }
 
+# HELP  install - Install new packages
+
 function apt_install {
+
+	local APT_ARCH=${HOSTTYPE/i6/x}
+	local APT_REPO_NAME
+	local APT_REPO_URL
+	local APT_PACKAGES_FILE
+	local APT_PACKAGE_FILE
+	local APT_PACKAGE_REQUIRES
+	local APT_PACKAGE_REQUIRE
+	local PACKAGE
+
+  for PACKAGE in $@
+  do
+
+		print_debug "Check '$PACKAGE' in installed packages .."
+		grep "^$PACKAGE$" /var/lib/apt/installed >/dev/null
+		if [ $? -eq 0 ]; then
+			print_debug "Package '$PACKAGE' already installed"
+			continue
+		fi
+		print_debug "Package '$PACKAGE' is not installed"
+
+		print_debug "Check '$PACKAGE' in repositories .."
+		cat /var/lib/apt/repositories | while read -r APT_REPO_LINE ; do
+
+			APT_REPO_NAME=${APT_REPO_LINE:0:32}
+			APT_REPO_URL=${APT_REPO_LINE:33}
+			APT_PACKAGES_FILE=/var/lib/apt/lists/$APT_REPO_NAME/packages
+			APT_PACKAGE_FILE=/var/cache/apt/$APT_REPO_NAME/$PACKAGE
+
+			if [ ! -f $APT_PACKAGES_FILE ]; then
+				continue
+			fi
+
+			awk '$1 == pc' RS='\n\n@ ' FS='\n' pc=$PACKAGE $APT_PACKAGES_FILE > $APT_PACKAGE_FILE
+			APT_PACKAGE_REQUIRES=$(awk '$1=="requires", $0=$2' FS=': ' $APT_PACKAGE_FILE)
+			for APT_PACKAGE_REQUIRE in $APT_PACKAGE_REQUIRES ; do
+				apt_install $APT_PACKAGE_REQUIRE
+				if [ $? -ne 0 ]; then
+					return $?
+				fi
+			done
+
+			print_debug "Installing '$PACKAGE' .."
+			APT_PACKAGE_URL=$( awk '$1 == "install:" {print $2; exit}' $APT_PACKAGE_FILE )
+			if [ -z "$APT_PACKAGE_URL" ]; then
+				print_error "Package URL is not found for '$PACKAGE' in repository '$APT_REPO_URL'"
+				return 1
+			fi
+			APT_PACKAGE_URL=$APT_REPO_URL/$APT_PACKAGE_URL
+			APT_PACKAGE_FILE=/var/cache/apt/$APT_REPO_NAME/$( basename $APT_PACKAGE_URL )
+			print_debug "Downloading '$APT_PACKAGE_URL' .."
+			print_debug "Download to '$APT_PACKAGE_FILE' .."
+			if [ ! -f $APT_PACKAGE_FILE ]; then
+				copy_url $APT_PACKAGE_URL $APT_PACKAGE_FILE
+			fi
+			return 0
+		done
+	done
+
+	return 0
+}
+
+function apt_install_old {
   check_packages
   find_workspace
   local pkg dn bn requires wr package sbq script
@@ -659,6 +724,11 @@ function apt_update {
 	mkdir -p /var/lib/apt/lists/$APT_REPO_NAME
 	mv $APT_REPO_CACHE_DIR/setup /var/lib/apt/lists/$APT_REPO_NAME/packages
 
+	print_debug "Updating /var/lib/apt/repositories .."
+	touch /var/lib/apt/repositories
+	echo $APT_REPO_NAME $APT_REPO_URL >> /var/lib/apt/repositories
+	sort /var/lib/apt/repositories | uniq > /var/lib/apt/repositories.1
+	mv /var/lib/apt/repositories.1 /var/lib/apt/repositories
 
 	print_debug "Done"
 }
