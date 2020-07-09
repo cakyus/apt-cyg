@@ -469,7 +469,7 @@ function apt_search {
   do
 		find /var/lib/apt/lists/ -type f -name packages \
 			| while read -r apt_package_file ; do
-			grep -niH "^@ $pkg" $apt_package_file
+			grep "^@ " $apt_package_file | grep $pkg | cut -b 3-
 		done
   done
 }
