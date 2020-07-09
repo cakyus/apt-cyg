@@ -23,6 +23,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+# HELP apt-cyg - package manager utility
+# HELP Usage: apt-cyg [options..] <command> [arguments..]
+# HELP Commands:
+
 if [ ${BASH_VERSINFO}${BASH_VERSINFO[1]} -lt 42 ]
 then
   echo 'Bash version 4.2+ required'
@@ -614,6 +618,8 @@ function apt_mirror {
   fi
 }
 
+# HELP  update - Retrieve new lists of packages
+
 function apt_cache {
   if [ "$pks" ]
   then
@@ -685,6 +691,10 @@ do
   esac
 done
 
+function apt_help(){
+	grep '^# HELP ' apt-cyg | cut -b 8-
+}
+
 set -a
 
 apt_init
@@ -694,5 +704,5 @@ then
 	readonly arch=${HOSTTYPE/i6/x}
 	apt_$command
 else
-	printf "$usage"
+	apt_help
 fi
