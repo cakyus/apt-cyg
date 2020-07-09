@@ -427,7 +427,20 @@ function download {
   echo $dn $bn > /tmp/dwn
 }
 
+# HELP  search - Search the package list for a regex pattern
+# TODO fix this
+
 function apt_search {
+  for pkg in "${pks[@]}"
+  do
+		find /var/lib/apt/lists/ -type f -name Packages \
+			| while read -r apt_package_file ; do
+			grep -niH '^@ rsync' $apt_package_file
+		done
+  done
+}
+
+function apt_search_old {
   check_packages
   echo Searching downloaded packages...
   for pkg in "${pks[@]}"
