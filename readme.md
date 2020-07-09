@@ -1,6 +1,8 @@
 apt-cyg
 =======
 
+CAUTION: This repository is unstable / experimental version. You need to watch your step !
+
 apt-cyg is a Cygwin package manager. It includes a command-line installer for
 Cygwin which cooperates with Cygwin Setup and uses the same repository.
 
