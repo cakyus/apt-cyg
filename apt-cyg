@@ -435,7 +435,7 @@ function download {
 function apt_search {
   for pkg in "${pks[@]}"
   do
-		find /var/lib/apt/lists/ -type f -name Packages \
+		find /var/lib/apt/lists/ -type f -name packages \
 			| while read -r apt_package_file ; do
 			grep -niH '^@ rsync' $apt_package_file
 		done
@@ -657,7 +657,8 @@ function apt_update {
 
 	print_debug "Updating /var/lib/apt/lists .."
 	mkdir -p /var/lib/apt/lists/$APT_REPO_NAME
-	mv $APT_REPO_CACHE_DIR/setup /var/lib/apt/lists/$APT_REPO_NAME/Packages
+	mv $APT_REPO_CACHE_DIR/setup /var/lib/apt/lists/$APT_REPO_NAME/packages
+
 
 	print_debug "Done"
 }
